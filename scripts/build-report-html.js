@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 import { PLATFORMS } from "../src/config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const RESULTS_DIR = path.resolve(__dirname, "..", "..", "results");
+const RESULTS_DIR = path.resolve(process.cwd(), "results");
 
 function readJson(p) {
   try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { return null; }

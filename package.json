@@ -11,7 +11,8 @@
     "bench": "node src/runBenchmark.js",
     "all": "node src/runAll.js",
     "report": "node scripts/build-report.js",
-    "report:html": "node scripts/build-report-html.js"
+    "report:html": "node scripts/build-report-html.js",
+    "simulate": "node scripts/simulate-results.js"
   },
   "dependencies": {
     "neo4j-driver": "^5.24.0",
