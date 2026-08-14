@@ -248,6 +248,14 @@ npm run report:html
 # open results/REPORT.html
 ```
 
+### 6a. Simulate results (optional, for testing the pipeline)
+If you want to test the full reporting pipeline without provisioning instances:
+```bash
+npm run simulate   # generates realistic simulated results for all 5 platforms
+npm run report     # builds the tables from simulated JSON
+```
+The simulated results are clearly marked and should be replaced with real measurements.
+
 ## Repository structure
 
 ```
@@ -258,7 +266,8 @@ npm run report:html
 │   ├── fetch-dataset.js         ← downloads raw SNAP soc-Pokec data
 │   ├── prepare-dataset.js       ← subsamples to a connected subgraph
 │   ├── build-report.js          ← builds results/REPORT.md from JSON results
-│   └── build-report-html.js     ← builds results/REPORT.html with Chart.js charts
+│   ├── build-report-html.js     ← builds results/REPORT.html with Chart.js charts
+│   └── simulate-results.js      ← generates realistic simulated benchmark results
 ├── src/
 │   ├── config.js                ← platform registry + specs + env wiring
 │   ├── metrics.js                ← percentile/timing helpers
