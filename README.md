@@ -190,13 +190,13 @@ Without credentials and schema installation, TigerGraph numbers are placeholders
 **6. Ingest throughput varies by 10× across platforms.**
 Neo4j Aura loaded 200K edges in 23.4s (12,426 rels/s) — 3.5× faster than CognoDB and 10× faster than ArangoDB (1,162 rels/s). This gap suggests ingest path efficiency differs significantly across platforms, with HTTP-based ingestion (ArangoDB) carrying substantial overhead.
 
-*Note: CognoDB, Memgraph, and TigerGraph results include real measurements where connectivity was possible. TigerGraph remains simulated pending credentials and schema installation.*
+*Note: CognoDB, Memgraph, and TigerGraph results include real measurements where connectivity was possible. TigerGraph remains simulated pending a running instance and valid credentials.*
 
 ## Caveats
 
 - **CognoDB free-tier CPU throttling:** CognoDB's measured latencies (~244 ms traversal, ~243 ms point lookup) are significantly higher than Neo4j Aura's (~28 ms) despite both using Bolt/Cypher. We attribute this to CognoDB c0 being a burstable 0.5 vCPU instance that throttles under sustained load. This is a real, measured caveat — not a simulation artifact.
 - **Memgraph Cloud unexpectedly slow:** Real Memgraph measurements (~173 ms traversals, ~173 ms point lookups) are slower than expected for an in-memory database. Possible causes: free-tier throttling, suboptimal Cypher queries for Memgraph's planner, or network latency. The 40 ops/sec at c=40 suggests severe throttling. These numbers should be verified with Memgraph support or a paid tier.
-- **TigerGraph credentials and schema missing:** TigerGraph host URL is known but username/password were not provided, and the one-time GSQL schema install was not run. TigerGraph results are simulated and should be replaced with real measurements.
+- **TigerGraph instance not accessible:** The TigerGraph Cloud instance at `tg-5c71ec22...i.tgcloud.io` returned `Auto start is not enabled for this workspace` from its REST++ endpoint, and the token request endpoint timed out. This indicates the instance is either paused, not started, or not reachable from our client. TigerGraph results in the tables are simulated. To get real numbers: resume the instance from the TigerGraph Cloud console, obtain the username/password, and run `src/adapters/tigergraph_schema.gsql` once in GraphStudio.
 - **Neo4j Aura password format issue:** The initial password had a trailing period that caused authentication failure. Removing it resolved the issue.
 - **ArangoDB Oasis query API fix:** arangojs v9 changed `db.query()` from object-style to positional arguments. The adapter was updated accordingly.
 - **Network variance:** All benchmarks run from a single client machine (Windows, India region). Platform instances may be in different regions, adding 1–5 ms RTT to every query.
