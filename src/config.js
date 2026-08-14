@@ -35,6 +35,7 @@ export const PLATFORMS = {
         uri: process.env.MEMGRAPH_URI,
         user: process.env.MEMGRAPH_USER,
         password: process.env.MEMGRAPH_PASSWORD,
+        encrypted: false,
       }),
   },
   arangodb: {

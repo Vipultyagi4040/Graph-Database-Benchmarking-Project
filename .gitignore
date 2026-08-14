@@ -29,3 +29,7 @@ npm-debug.log*
 # Build / coverage
 coverage/
 .nyc_output/
+
+# TLS certificates (downloaded for Memgraph trust)
+*.crt
+*.pem

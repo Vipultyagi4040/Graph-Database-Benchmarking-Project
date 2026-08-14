@@ -105,16 +105,16 @@ Iteration count and concurrency levels are configurable via `.env`
 <!-- RESULTS_START -->
 # Results Matrix (auto-generated)
 
-Generated: 2026-08-14T08:17:33.472Z
+Generated: 2026-08-14T10:32:23.029Z
 
 ## Ingest
 
 | Platform | Nodes | Edges | Load time (s) | Nodes/s | Rels/s |
 |---|---|---|---|---|---|
 | CognoDB Cloud | 87468 | 200000 | 96.42 | 3444 | 3052 |
-| Neo4j Aura Free | 87468 | 200000 | 84.37 | 4275 | 3322 |
+| Neo4j Aura Free | 87468 | 200000 | 23.44 | 11912.75 | 12426.27 |
 | Memgraph Cloud | 87468 | 200000 | 67.49 | 4911 | 4295 |
-| ArangoDB Oasis | 87468 | 200000 | 134.99 | 2599 | 2079 |
+| ArangoDB Oasis | 87468 | 200000 | 257.62 | 1022.47 | 1162.27 |
 | TigerGraph Cloud | 87468 | 200000 | 120.07 | 3024 | 1989 |
 
 ## Traversals (p50 / p95 ms)
@@ -122,9 +122,9 @@ Generated: 2026-08-14T08:17:33.472Z
 | Platform | 1-hop | 2-hop | 3-hop |
 |---|---|---|---|
 | CognoDB Cloud | 2.64 / 5.84 | 11.8 / 14.14 | 56.47 / 112.26 |
-| Neo4j Aura Free | 2.22 / 4.4 | 10.72 / 13.05 | 48.27 / 58.45 |
+| Neo4j Aura Free | 28.52 / 34.64 | 28.53 / 33.46 | 28.45 / 30.78 |
 | Memgraph Cloud | 1.17 / 1.44 | 5.13 / 5.96 | 22.5 / 26.38 |
-| ArangoDB Oasis | 3.41 / 7.06 | 17.43 / 21.06 | 82.09 / 95.73 |
+| ArangoDB Oasis | 270.98 / 324.12 | 270.05 / 302.21 | 267.43 / 332.78 |
 | TigerGraph Cloud | 4.08 / 4.75 | 15.49 / 31.38 | 47.66 / 112.36 |
 
 ## Lookups (p50 / p95 ms)
@@ -132,9 +132,9 @@ Generated: 2026-08-14T08:17:33.472Z
 | Platform | Point lookup | Indexed lookup |
 |---|---|---|
 | CognoDB Cloud | 1.82 / 2.14 | 3.21 / 3.83 |
-| Neo4j Aura Free | 1.53 / 1.79 | 2.88 / 6.26 |
+| Neo4j Aura Free | 28.85 / 34.58 | 28.92 / 32.04 |
 | Memgraph Cloud | 0.93 / 1.07 | 1.86 / 3.82 |
-| ArangoDB Oasis | 2.57 / 5.19 | 4.69 / 5.34 |
+| ArangoDB Oasis | 267.1 / 303.97 | 268.68 / 347 |
 | TigerGraph Cloud | 3.1 / 3.6 | 5.43 / 6.58 |
 
 ## Aggregation (p50 / p95 ms)
@@ -142,9 +142,9 @@ Generated: 2026-08-14T08:17:33.472Z
 | Platform | Aggregation |
 |---|---|
 | CognoDB Cloud | 17.29 / 21.48 |
-| Neo4j Aura Free | 17.45 / 41.32 |
+| Neo4j Aura Free | 46.5 / 59.9 |
 | Memgraph Cloud | 12.19 / 25.69 |
-| ArangoDB Oasis | 21.52 / 46.67 |
+| ArangoDB Oasis | 308.57 / 692.75 |
 | TigerGraph Cloud | 19.6 / 22.75 |
 
 ## Mixed workload throughput (ops/sec)
@@ -152,9 +152,9 @@ Generated: 2026-08-14T08:17:33.472Z
 | Platform | c=1 | c=10 | c=40 |
 |---|---|---|---|
 | CognoDB Cloud | 50 | 466 | 1625 |
-| Neo4j Aura Free | 50 | 490 | 2114 |
+| Neo4j Aura Free | 27.08 | 314.33 | 756.67 |
 | Memgraph Cloud | 70 | 786 | 3141 |
-| ArangoDB Oasis | 31 | 313 | 1069 |
+| ArangoDB Oasis | 3.61 | 9.62 | 10.73 |
 | TigerGraph Cloud | 27 | 231 | 936 |
 
 ## Footprint
@@ -162,9 +162,9 @@ Generated: 2026-08-14T08:17:33.472Z
 | Platform | Note |
 |---|---|
 | CognoDB Cloud | Simulated — real instances needed for actual footprint data |
-| Neo4j Aura Free | Simulated — real instances needed for actual footprint data |
+| Neo4j Aura Free | not exposed via Bolt on this platform |
 | Memgraph Cloud | Simulated — real instances needed for actual footprint data |
-| ArangoDB Oasis | Simulated — real instances needed for actual footprint data |
+| ArangoDB Oasis | from ArangoDB /_admin/statistics |
 | TigerGraph Cloud | Simulated — real instances needed for actual footprint data |
 <!-- RESULTS_END -->
 
