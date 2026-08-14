@@ -1,0 +1,4 @@
+# Data directory
+# Raw and prepared datasets are generated at runtime by:
+#   npm run dataset:fetch
+#   npm run dataset:prepare
