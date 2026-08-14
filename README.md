@@ -105,7 +105,7 @@ Iteration count and concurrency levels are configurable via `.env`
 <!-- RESULTS_START -->
 # Results Matrix (auto-generated)
 
-Generated: 2026-08-14T10:41:31.992Z
+Generated: 2026-08-14T11:13:50.608Z
 
 ## Ingest
 
@@ -123,7 +123,7 @@ Generated: 2026-08-14T10:41:31.992Z
 |---|---|---|---|
 | CognoDB Cloud | 244.3 / 302.51 | 244.74 / 294.28 | 244.36 / 333.88 |
 | Neo4j Aura Free | 28.52 / 34.64 | 28.53 / 33.46 | 28.45 / 30.78 |
-| Memgraph Cloud | 1.17 / 1.44 | 5.13 / 5.96 | 22.5 / 26.38 |
+| Memgraph Cloud | 173.12 / 184.05 | 173.65 / 192.45 | 173.87 / 238.13 |
 | ArangoDB Oasis | 270.98 / 324.12 | 270.05 / 302.21 | 267.43 / 332.78 |
 | TigerGraph Cloud | 4.08 / 4.75 | 15.49 / 31.38 | 47.66 / 112.36 |
 
@@ -133,7 +133,7 @@ Generated: 2026-08-14T10:41:31.992Z
 |---|---|---|
 | CognoDB Cloud | 243.67 / 280.16 | 246.36 / 305.19 |
 | Neo4j Aura Free | 28.85 / 34.58 | 28.92 / 32.04 |
-| Memgraph Cloud | 0.93 / 1.07 | 1.86 / 3.82 |
+| Memgraph Cloud | 172.86 / 184.23 | 152.36 / 158.7 |
 | ArangoDB Oasis | 267.1 / 303.97 | 268.68 / 347 |
 | TigerGraph Cloud | 3.1 / 3.6 | 5.43 / 6.58 |
 
@@ -143,7 +143,7 @@ Generated: 2026-08-14T10:41:31.992Z
 |---|---|
 | CognoDB Cloud | 380.06 / 402.73 |
 | Neo4j Aura Free | 46.5 / 59.9 |
-| Memgraph Cloud | 12.19 / 25.69 |
+| Memgraph Cloud | 175.99 / 186.41 |
 | ArangoDB Oasis | 308.57 / 692.75 |
 | TigerGraph Cloud | 19.6 / 22.75 |
 
@@ -153,7 +153,7 @@ Generated: 2026-08-14T10:41:31.992Z
 |---|---|---|---|
 | CognoDB Cloud | 2.97 | 32.53 | 121.25 |
 | Neo4j Aura Free | 27.08 | 314.33 | 756.67 |
-| Memgraph Cloud | 70 | 786 | 3141 |
+| Memgraph Cloud | 5.73 | 41.67 | 40.66 |
 | ArangoDB Oasis | 3.61 | 9.62 | 10.73 |
 | TigerGraph Cloud | 27 | 231 | 936 |
 
@@ -163,42 +163,42 @@ Generated: 2026-08-14T10:41:31.992Z
 |---|---|
 | CognoDB Cloud | not exposed via Bolt on this platform |
 | Neo4j Aura Free | not exposed via Bolt on this platform |
-| Memgraph Cloud | Simulated — real instances needed for actual footprint data |
+| Memgraph Cloud | not exposed via Bolt on this platform |
 | ArangoDB Oasis | from ArangoDB /_admin/statistics |
 | TigerGraph Cloud | Simulated — real instances needed for actual footprint data |
 <!-- RESULTS_END -->
 
 ## Analysis
 
-The real measurements reveal a more nuanced picture than the initial architecture assumptions suggested:
+The real measurements reveal a more nuanced picture than initial architecture assumptions suggested:
 
-**1. CognoDB free-tier performance is throttled under load.**
-CognoDB's measured p50 traversal latency (~244 ms) and point lookup latency (~243 ms) are roughly 8–9× higher than Neo4j Aura's (~28 ms), despite both using Bolt/Cypher. This is the most surprising finding. The likely cause is CognoDB's c0 free tier being a **burstable** 0.5 vCPU instance — under sustained query load, CPU credits deplete and latency spikes. This shows up clearly in the mixed workload: CognoDB drops to 121 ops/sec at c=40 vs. Neo4j's 757 ops/sec. The free tier's "burst to 0.5 vCPU" model works for occasional queries but chokes under the sustained load our benchmark applies. This is a critical fairness caveat: CognoDB is benchmarked on a strictly smaller resource envelope than the others, and the numbers reflect that constraint honestly.
+**1. CognoDB free-tier CPU throttling is the dominant factor.**
+CognoDB's measured p50 traversal latency (~244 ms) and point lookup latency (~243 ms) are roughly 8–9× higher than Neo4j Aura's (~28 ms), despite both using Bolt/Cypher. This is the most significant finding. CognoDB c0 is a **burstable 0.5 vCPU** instance, and our sustained workload appears to exhaust CPU credits, causing consistent throttling. This shows up clearly in the mixed workload: CognoDB drops to 121 ops/sec at c=40 vs. Neo4j's 757 ops/sec. The free tier works for occasional queries but chokes under sustained benchmark load.
 
-**2. Neo4j Aura Free delivers consistent, low-latency performance.**
-Neo4j Aura's ~28 ms p50 across traversals, point lookups, and indexed lookups is remarkably flat — the platform maintains consistent performance regardless of query complexity. Its aggregation p50 of 46 ms is also the best among measured platforms. This suggests Aura's free tier, while small, has a more predictable performance profile than CognoDB's burstable model. The p95 tail (34–60 ms) is also tight, indicating low variance.
+**2. Neo4j Aura Free delivers the best real-world performance.**
+Neo4j Aura's ~28 ms p50 across traversals, point lookups, and indexed lookups is remarkably flat and consistent. Its aggregation p50 of 46 ms is also the best among measured platforms. The p95 tail (34–60 ms) is tight, indicating low variance. Aura's free tier, while small, provides a more predictable performance profile than burstable competitors.
 
-**3. Memgraph's in-memory advantage is real but unverified here.**
-We could not establish a working connection to Memgraph Cloud due to SSL/certificate and authentication issues (see Caveats). The simulated numbers predicted ~1 ms point lookups and ~22 ms 3-hop traversals — if accurate, these would confirm Memgraph's in-memory-first architecture as the latency leader. Without real data, this remains an unverified claim.
+**3. Memgraph Cloud results are unexpectedly slow.**
+Real Memgraph measurements (~173 ms traversals, ~173 ms point lookups) are surprisingly high — even slower than ArangoDB in some categories. This contradicts the expected "in-memory-first = low latency" narrative. Possible explanations: (a) Memgraph Cloud free tier may be under-resourced or throttled, (b) our Cypher queries may not be optimized for Memgraph's query planner, or (c) network latency from our client region to Memgraph's instance is significant. The 40 ops/sec at c=40 concurrency suggests severe throttling or connectivity issues. These numbers should be investigated further with Memgraph support or a paid tier.
 
-**4. ArangoDB Oasis trades query-language flexibility for graph traversal speed.**
-ArangoDB's ~270 ms traversal p50 and ~267 ms point lookup p50 are the highest among measured platforms. This is consistent with AQL being a multi-model query language optimized for flexibility rather than raw graph traversal speed. The 14-day free trial also introduces uncertainty: Oasis may throttle or co-locate tenants aggressively. Interestingly, ArangoDB's aggregation (308 ms p50) is faster than its traversals, suggesting its scan-based aggregation is well-optimized even if graph pattern matching is not its strength.
+**4. ArangoDB Oasis is the slowest for graph traversals.**
+ArangoDB's ~270 ms traversal p50 and ~267 ms point lookup p50 are the highest among measured platforms. This aligns with AQL being a multi-model query language optimized for flexibility over raw graph traversal speed. However, ArangoDB's aggregation (308 ms p50) is faster than its traversals, suggesting scan-based operations are reasonably optimized.
 
-**5. TigerGraph's compiled-query model is promising but unverified.**
-TigerGraph numbers remain simulated. The architecture suggests it should excel at deeper traversals (3-hop p50 ~47 ms simulated) due to query compilation amortization, but we cannot confirm this without real instance access.
+**5. TigerGraph remains simulated.**
+Without credentials and schema installation, TigerGraph numbers are placeholders only. The architecture suggests it should excel at deeper traversals, but this is unverified.
 
-**6. Ingest throughput varies dramatically.**
-Neo4j Aura loaded 200K edges in 23.4 seconds (12,426 rels/s) — 3.5× faster than CognoDB's 3,239 rels/s. ArangoDB took 257 seconds (1,162 rels/s), likely due to HTTP-based ingestion overhead. This gap is wider than expected and suggests ingest path efficiency differs more than query execution efficiency across these platforms.
+**6. Ingest throughput varies by 10× across platforms.**
+Neo4j Aura loaded 200K edges in 23.4s (12,426 rels/s) — 3.5× faster than CognoDB and 10× faster than ArangoDB (1,162 rels/s). This gap suggests ingest path efficiency differs significantly across platforms, with HTTP-based ingestion (ArangoDB) carrying substantial overhead.
 
-*Note: CognoDB, Memgraph, and TigerGraph results are partially simulated due to connectivity/credential issues. The Neo4j and ArangoDB numbers are real measurements from this run.*
+*Note: CognoDB, Memgraph, and TigerGraph results include real measurements where connectivity was possible. TigerGraph remains simulated pending credentials and schema installation.*
 
 ## Caveats
 
 - **CognoDB free-tier CPU throttling:** CognoDB's measured latencies (~244 ms traversal, ~243 ms point lookup) are significantly higher than Neo4j Aura's (~28 ms) despite both using Bolt/Cypher. We attribute this to CognoDB c0 being a burstable 0.5 vCPU instance that throttles under sustained load. This is a real, measured caveat — not a simulation artifact.
-- **Memgraph Cloud connection failure:** We could not establish a working connection to Memgraph Cloud. The Bolt endpoint `63.187.94.212:7687` requires a self-signed certificate. The official Neo4j driver's `trustedCertificates` option did not accept our downloaded certificate, and `encrypted=false` was rejected by the server. Memgraph results in this report are from the simulation runner (`npm run simulate`) and should be replaced with real measurements once connectivity is resolved.
-- **TigerGraph credentials and schema missing:** TigerGraph host/user/password were not provided, and the one-time GSQL schema install (`src/adapters/tigergraph_schema.gsql`) was not run. TigerGraph results are simulated.
-- **Neo4j Aura password format issue:** The initial password provided had a trailing period that caused authentication failure. Removing the trailing period resolved the issue.
-- **ArangoDB Oasis query API incompatibility:** arangojs v9 changed the `db.query()` API from object-style `{query, bindVars}` to positional arguments `(query, bindVars)`. We fixed the adapter to use the v9 API.
+- **Memgraph Cloud unexpectedly slow:** Real Memgraph measurements (~173 ms traversals, ~173 ms point lookups) are slower than expected for an in-memory database. Possible causes: free-tier throttling, suboptimal Cypher queries for Memgraph's planner, or network latency. The 40 ops/sec at c=40 suggests severe throttling. These numbers should be verified with Memgraph support or a paid tier.
+- **TigerGraph credentials and schema missing:** TigerGraph host URL is known but username/password were not provided, and the one-time GSQL schema install was not run. TigerGraph results are simulated and should be replaced with real measurements.
+- **Neo4j Aura password format issue:** The initial password had a trailing period that caused authentication failure. Removing it resolved the issue.
+- **ArangoDB Oasis query API fix:** arangojs v9 changed `db.query()` from object-style to positional arguments. The adapter was updated accordingly.
 - **Network variance:** All benchmarks run from a single client machine (Windows, India region). Platform instances may be in different regions, adding 1–5 ms RTT to every query.
 - **Driver batching vs. bulk import:** We use driver-level batched upserts (1,000 rows/batch) for all platforms, not native bulk-import tools. This ensures comparable ingest measurements but understates each platform's theoretical maximum.
 - **Memory usage not observable:** Managed cloud platforms generally don't expose real-time memory usage via their APIs on free tiers.

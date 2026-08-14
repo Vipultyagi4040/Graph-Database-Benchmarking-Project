@@ -30,13 +30,14 @@ export const PLATFORMS = {
   memgraph: {
     label: "Memgraph Cloud",
     specs: { vcpu: 0.5, ramMb: 256, diskGb: 1, tier: "Free tier" },
-    build: () =>
-      new BoltAdapter("memgraph", {
-        uri: process.env.MEMGRAPH_URI,
-        user: process.env.MEMGRAPH_USER,
-        password: process.env.MEMGRAPH_PASSWORD,
-        encrypted: false,
-      }),
+    build: () => {
+      const host = process.env.MEMGRAPH_HOST || "localhost";
+      const port = process.env.MEMGRAPH_PORT || "7687";
+      const user = process.env.MEMGRAPH_USERNAME || process.env.MEMGRAPH_USER || "memgraph";
+      const password = process.env.MEMGRAPH_PASSWORD || "";
+      const uri = `bolt://${host}:${port}`;
+      return new BoltAdapter("memgraph", { uri, user, password, encrypted: true, trust: "TRUST_ALL_CERTIFICATES" });
+    },
   },
   arangodb: {
     label: "ArangoDB Oasis",

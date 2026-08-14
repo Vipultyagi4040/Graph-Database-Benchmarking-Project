@@ -7,18 +7,22 @@ import neo4j from "neo4j-driver";
 import { BaseAdapter } from "./BaseAdapter.js";
 
 export class BoltAdapter extends BaseAdapter {
-  constructor(name, { uri, user, password, encrypted }) {
+  constructor(name, { uri, user, password, encrypted, trust }) {
     super(name);
     this.uri = uri;
     this.user = user;
     this.password = password;
     this.encrypted = encrypted;
+    this.trust = trust;
   }
 
   async connect() {
     const config = { maxConnectionPoolSize: 50 };
     if (this.encrypted !== undefined) {
       config.encrypted = this.encrypted;
+    }
+    if (this.trust !== undefined) {
+      config.trust = this.trust;
     }
     this.driver = neo4j.driver(this.uri, neo4j.auth.basic(this.user, this.password), config);
     await this.driver.verifyConnectivity();
