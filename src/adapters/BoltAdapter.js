@@ -63,7 +63,7 @@ export class BoltAdapter extends BaseAdapter {
     const session = this.driver.session();
     try {
       await session.run(
-        "UNWIND $rows AS row CREATE (n:Person {id: row.id, age: row.age})",
+        "UNWIND $rows AS row MERGE (n:Person {id: row.id}) ON CREATE SET n.age = row.age",
         { rows }
       );
     } finally {
@@ -77,7 +77,7 @@ export class BoltAdapter extends BaseAdapter {
       await session.run(
         `UNWIND $rows AS row
          MATCH (a:Person {id: row.src}), (b:Person {id: row.dst})
-         CREATE (a)-[:KNOWS]->(b)`,
+         MERGE (a)-[:KNOWS]->(b)`,
         { rows }
       );
     } finally {
