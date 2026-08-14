@@ -1,0 +1,53 @@
+// Run this once against your TigerGraph Cloud instance before benchmarking,
+// e.g.: gsql -g benchmark tigergraph_schema.gsql
+// (or paste it into the GraphStudio / Cloud Portal GSQL editor)
+
+CREATE VERTEX Person (PRIMARY_ID nid UINT, age UINT) WITH STATS="OUTDEGREE_BY_EDGETYPE"
+CREATE DIRECTED EDGE Knows (FROM Person, TO Person)
+CREATE GRAPH benchmark (Person, Knows)
+
+USE GRAPH benchmark
+
+CREATE QUERY traversalNHop(VERTEX<Person> start, INT hops) FOR GRAPH benchmark {
+  SetAccum<VERTEX> @@seen;
+  Start = {start};
+  Frontier = Start;
+  WHILE Frontier.size() > 0 AND hops > 0 DO
+    Frontier = SELECT t FROM Frontier:s -(Knows:e)-> Person:t
+               WHERE @@seen.contains(t) == FALSE
+               ACCUM @@seen += t;
+    hops = hops - 1;
+  END;
+  PRINT @@seen.size() AS reachedCount;
+}
+
+CREATE QUERY pointLookup(VERTEX<Person> targetId) FOR GRAPH benchmark {
+  Start = {targetId};
+  PRINT Start.size() AS found;
+}
+
+CREATE QUERY indexedLookup(INT targetAge) FOR GRAPH benchmark {
+  All = {Person.*};
+  Matched = SELECT p FROM All:p WHERE p.age == targetAge;
+  PRINT Matched.size() AS matchCount;
+}
+
+CREATE QUERY ageAggregation() FOR GRAPH benchmark {
+  All = {Person.*};
+  Grouped = SELECT p FROM All:p
+            POST-ACCUM @@groupCount += 1
+            ;
+  GroupByAccum<INT age, SumAccum<INT> cnt> @@byAge;
+  All2 = {Person.*};
+  Grouped2 = SELECT p FROM All2:p
+             ACCUM @@byAge += (p.age -> 1);
+  PRINT @@byAge AS groups;
+}
+
+CREATE QUERY touchNode(VERTEX<Person> targetId) FOR GRAPH benchmark {
+  Start = {targetId};
+  UPDATE p FROM Start:p SET p.age = p.age;
+  PRINT "ok" AS status;
+}
+
+INSTALL QUERY traversalNHop, pointLookup, indexedLookup, ageAggregation, touchNode

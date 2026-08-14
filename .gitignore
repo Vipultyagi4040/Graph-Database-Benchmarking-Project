@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Data (too large for git)
+data/raw/
+data/prepared/
+
+# Results (generated at runtime)
+results/
+
+# Secrets — never commit these
+.env
+.env.local
+.env.*.local
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Build / coverage
+coverage/
+.nyc_output/
