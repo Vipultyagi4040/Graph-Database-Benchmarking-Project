@@ -8,14 +8,7 @@ identical logical queries, and matched free-tier resources.
 Goal: an honest, reproducible answer to "how does CognoDB actually perform
 against the alternatives?", not a verdict on which database "wins".
 
-> **Status:** benchmark harness complete with simulated results. The dataset
-> has been prepared (87,468 nodes / 200,000 edges from SNAP soc-Pokec) and
-> the full benchmark pipeline is scripted. Results tables are populated with
-> realistic simulated data based on platform architecture characteristics.
-> To replace with real measurements, provision free-tier instances and run
-> `npm run all` (see [Reproducing this benchmark](#reproducing-this-benchmark)).
-> Each `results/*.json` file is the source of truth; `npm run report`
-> regenerates the tables below from it.
+> **Status:** benchmark complete with real measurements for 4 out of 5 platforms. CognoDB, Neo4j Aura, Memgraph Cloud, and ArangoDB Oasis results are from actual benchmark runs. TigerGraph results are simulated because the instance was not accessible (`Auto start is not enabled`). An HTML report with charts is available at `results/REPORT.html`. Each `results/*.json` file is the source of truth; `npm run report` regenerates the tables below from it.
 
 ## Why these five platforms
 
